@@ -1,15 +1,11 @@
-'use strict';
+import * as util from './util'
+import * as client from './client'
 
-var util = require('./util.js');
-
-module.exports = function(client){
-	var marketplace = {};
-	
 	/**
 	 * Copy the getInventory function from the user module
 	 */
 	
-	marketplace.getInventory = require('./user.js')(client).getInventory;
+export const getInventory = require('./user.js')(client).getInventory;
 	
 	/**
 	 * Get a marketplace listing
@@ -18,7 +14,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.getListing = function(listing, callback){
+export const getListing = function(listing, callback){
 		return client.get('/marketplace/listings/'+listing, callback);
 	};
 	
@@ -29,7 +25,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.addListing = function(data, callback){
+export const addListing = function(data, callback){
 		return client.post({url: '/marketplace/listings', authLevel: 2}, data, callback);
 	};
 	
@@ -41,7 +37,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.editListing = function(listing, data, callback){
+export const editListing = function(listing, data, callback){
 		return client.post({url: '/marketplace/listings/'+listing, authLevel: 2}, data, callback);
 	};
 	
@@ -52,8 +48,8 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.deleteListing = function(listing, callback){
-		return client.delete({url: '/marketplace/listings/'+listing, authLevel: 2}, callback);
+export const deleteListing = function(listing, callback){
+		return client.deleteItem({url: '/marketplace/listings/'+listing, authLevel: 2}, callback);
 	};
 	
 	/**
@@ -63,7 +59,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.getOrders = function(params, callback){
+export const getOrders = function(params, callback){
 		var path = '/marketplace/orders';
 		if((arguments.length === 1) && (typeof params === 'function')){
 			callback = params;
@@ -80,7 +76,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.getOrder = function(order, callback){
+export const getOrder = function(order, callback){
 		return client.get({url: '/marketplace/orders/'+order, authLevel: 2}, callback);
 	};
 	
@@ -92,7 +88,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.editOrder = function(order, data, callback){
+export const editOrder = function(order, data, callback){
 		return client.post({url: '/marketplace/orders/'+order, authLevel: 2}, data, callback);
 	};
 	
@@ -104,7 +100,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.getOrderMessages = function(order, params, callback){
+export const getOrderMessages = function(order, params, callback){
 		var path = '/marketplace/orders/'+order+'/messages';
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -122,7 +118,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.addOrderMessage = function(order, data, callback){
+export const addOrderMessage = function(order, data, callback){
 		return client.post({url: '/marketplace/orders/'+order+'/messages', authLevel: 2}, data, callback);
 	};
 	
@@ -134,7 +130,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.getFee = function(price, currency, callback){
+export const getFee = function(price, currency, callback){
 		var path = '/marketplace/fee/'+((typeof price === 'number') ? price.toFixed(2) : price);
 		if((arguments.length === 2) && (typeof currency === 'function')){
 			callback = currency;
@@ -151,9 +147,6 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	marketplace.getPriceSuggestions = function(release, callback){
+export const getPriceSuggestions = function(release, callback){
 		return client.get({url: '/marketplace/price_suggestions/'+release, authLevel: 2}, callback);
 	};
-	
-	return marketplace;
-};

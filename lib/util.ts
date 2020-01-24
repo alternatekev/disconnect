@@ -1,8 +1,5 @@
-'use strict';
 
-var queryString = require('querystring');
-
-var util = module.exports = {};
+import queryString from 'querystring'
 
 /**
  * Strip the trailing number from a Discogs artist name Artist (2) -> Artist
@@ -10,7 +7,7 @@ var util = module.exports = {};
  * @return {string}
  */
 
-util.stripVariation = function(name){
+export const stripVariation = function(name){
 	return name.replace(/\s\(\d+\)$/, '');
 };
 
@@ -21,7 +18,7 @@ util.stripVariation = function(name){
  * @returns {string}
  */
 
-util.addParams = function(url, data){
+export const addParams = function(url, data){
 	if(data && (typeof data === 'object') && (Object.keys(data).length > 0)){
 		url = url+((url.indexOf('?')===-1) ? '?' : '&')+queryString.stringify(data);
 	}
@@ -34,7 +31,7 @@ util.addParams = function(url, data){
  * @returns {string}
  */
 
-util.escape = function(str){
+export const escape = function(str){
 	return queryString.escape(str);
 };
 
@@ -45,7 +42,7 @@ util.escape = function(str){
  * @returns {object}
  */
 
-util.merge = function merge(target, source){
+export const merge = function merge(target, source){
 	for(var key in source){
 		if(source[key] && (typeof source[key] === 'object')){
 			target[key] = merge((Array.isArray(source[key]) ? [] : {}), source[key]);
@@ -59,5 +56,3 @@ util.merge = function merge(target, source){
 /**
  * Expose the queuing class
  */
-
-util.Queue = require('./queue.js');

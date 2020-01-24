@@ -1,10 +1,6 @@
-'use strict';
-
-var util = require('./util.js'),
-	AuthError = require('./error.js').AuthError;
-
-module.exports = function(client){
-	var collection = {};
+import * as util from './util'
+import {AuthError} from './error'
+import * as client from './client'
 	
 	/**
 	 * Get a list of all collection folders for the given user
@@ -13,7 +9,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.getFolders = function(user, callback){
+export const getFolders = function(user, callback){
 		return client.get('/users/'+util.escape(user)+'/collection/folders', callback);
 	};
 	
@@ -25,7 +21,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.getFolder = function(user, folder, callback){
+export const getFolder = function(user, folder, callback){
 		if(client.authenticated(2) || (parseInt(folder, 10) === 0)){
 			return client.get('/users/'+util.escape(user)+'/collection/folders/'+folder, callback);
 		}else if(typeof callback === 'function'){
@@ -44,7 +40,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.addFolder = function(user, name, callback){
+export const addFolder = function(user, name, callback){
 		return client.post({url: '/users/'+util.escape(user)+'/collection/folders', authLevel: 2}, {name: name}, callback);
 	};
 	
@@ -57,7 +53,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.setFolderName = function(user, folder, name, callback){
+export const setFolderName = function(user, folder, name, callback){
 		return client.post({url: '/users/'+util.escape(user)+'/collection/folders/'+folder, authLevel: 2}, {name: name}, callback);
 	};
 	
@@ -69,8 +65,8 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.deleteFolder = function(user, folder, callback){
-		return client.delete({url: '/users/'+util.escape(user)+'/collection/folders/'+folder, authLevel: 2}, callback);
+export const deleteFolder = function(user, folder, callback){
+		return client.deleteItem({url: '/users/'+util.escape(user)+'/collection/folders/'+folder, authLevel: 2}, callback);
 	};
 	
 	/**
@@ -82,7 +78,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.getReleases = function(user, folder, params, callback){
+export const getReleases = function(user, folder, params, callback){
 		if(client.authenticated(2) || (parseInt(folder, 10) === 0)){
 			var path = '/users/'+util.escape(user)+'/collection/folders/'+folder+'/releases';
 			if((arguments.length === 3) && (typeof params === 'function')){
@@ -107,7 +103,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.getReleaseInstances = function(user, release, callback){
+export const getReleaseInstances = function(user, release, callback){
 		return client.get('/users/'+util.escape(user)+'/collection/releases/'+release, callback);
 	};
 	
@@ -120,7 +116,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.addRelease = function(user, folder, release, callback){
+export const addRelease = function(user, folder, release, callback){
 		if((arguments.length === 3) && (typeof release === 'function')){
 			callback = release; release = folder; folder = 1;
 		}
@@ -138,7 +134,7 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.editRelease = function(user, folder, release, instance, data, callback){
+export const editRelease = function(user, folder, release, instance, data, callback){
 		return client.post({url: '/users/'+util.escape(user)+'/collection/folders/'+folder+'/releases/'+release+'/instances/'+instance, authLevel: 2}, data, callback);
 	};
 	
@@ -152,9 +148,6 @@ module.exports = function(client){
 	 * @returns {DiscogsClient|Promise}
 	 */
 	
-	collection.removeRelease = function(user, folder, release, instance, callback){
-		return client.delete({url: '/users/'+util.escape(user)+'/collection/folders/'+folder+'/releases/'+release+'/instances/'+instance, authLevel: 2}, callback);
+export const removeRelease = function(user, folder, release, instance, callback){
+		return client.deleteItem({url: '/users/'+util.escape(user)+'/collection/folders/'+folder+'/releases/'+release+'/instances/'+instance, authLevel: 2}, callback);
 	};
-	
-	return collection;
-};

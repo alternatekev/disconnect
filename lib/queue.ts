@@ -1,9 +1,6 @@
-'use strict';
 
-var DiscogsError = require('./error.js').DiscogsError,
-	util = require('./util.js');
-
-module.exports = Queue;
+import {DiscogsError} from './error'
+import * as util from './util'
 
 /**
  * Default configuration
@@ -22,7 +19,7 @@ var defaultConfig = {
  * @returns {Queue}
  */
 
-function Queue(customConfig){
+function Queue(customConfig): void{
 	// Allow the class to be called as a function, returning an instance
 	if(!(this instanceof Queue)){
         return new Queue(customConfig);

@@ -1,10 +1,6 @@
-'use strict';
+import * as util from './util'
+import * as client from './client'
 
-var util = require('./util.js');
-
-module.exports = function(client){
-	var wantlist = {};
-	
 	/**
 	 * Get the list of wantlisted releases for the given user name
 	 * @param {string} user - The user name
@@ -13,7 +9,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	wantlist.getReleases = function(user, params, callback){
+export const getWantlistReleases = function(user, params, callback){
 		var path = '/users/'+util.escape(user)+'/wants';
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -32,7 +28,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	wantlist.addRelease = function(user, release, data, callback){
+export const addWantlistRelease = function(user, release, data, callback){
 		var _data = data;
 		if((arguments.length === 3) && (typeof data === 'function')){
 			callback = data;
@@ -50,7 +46,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	wantlist.editNotes = function(user, release, data, callback){
+export const editNotes = function(user, release, data, callback){
 		return client.put({url: '/users/'+util.escape(user)+'/wants/'+release, authLevel: 2}, data, callback);
 	};
 	
@@ -62,9 +58,6 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	wantlist.removeRelease = function(user, release, callback){
-		return client.delete({url: '/users/'+util.escape(user)+'/wants/'+release, authLevel: 2}, callback);
+export const removeWantlistRelease = function(user, release, callback){
+		return client.deleteItem({url: '/users/'+util.escape(user)+'/wants/'+release, authLevel: 2}, callback);
 	};
-	
-	return wantlist;
-};

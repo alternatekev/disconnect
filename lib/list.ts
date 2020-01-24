@@ -1,10 +1,6 @@
-'use strict';
+import * as util from './util'
+import * as client from './client'
 
-var util = require('./util.js');
-
-module.exports = function(client){
-	var list = {};
-	
 	/**
 	 * Get the items in a list by list ID
 	 * @param {(number|string)} list - The list ID
@@ -13,7 +9,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	list.getItems = function(list, params, callback){
+export const getItems = function(list, params, callback){
 		var path = '/lists/'+util.escape(list);
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -22,6 +18,3 @@ module.exports = function(client){
 		}
 		return client.get(path, callback);
 	};
-	
-	return list;
-};

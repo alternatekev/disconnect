@@ -1,10 +1,7 @@
-'use strict';
 
-var util = require('./util.js');
+import * as util from './util'
+import * as client from './client'
 
-module.exports = function(client){
-	var user = {};
-	
 	/**
 	 * Get the profile for the given user
 	 * @param {string} user - The user name
@@ -12,7 +9,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 
-	user.getProfile = function(user, callback){
+export const getProfile = function(user, callback){
 		return client.get('/users/'+util.escape(user), callback);
 	};
 	
@@ -24,7 +21,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 
-	user.getInventory = function(user, params, callback){
+export const getInventory = function(user, params, callback){
 		var path = '/users/'+util.escape(user)+'/inventory';
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -38,34 +35,26 @@ module.exports = function(client){
 	 * Copy the client getIdentity function to the user module
 	 */
  
-	user.getIdentity = client.getIdentity;
+export const getIdentity = client.getIdentity;
 	
 	/**
 	 * Expose the collection functions and pass the client instance
 	 * @returns {object}
 	 */
 	
-	user.collection = function(){
-		return require('./collection.js')(client);
-	};
-	
+export * from './collection'
 	/**
 	 * Expose the wantlist functions and pass the client instance
 	 * @returns {object}
 	 */
 	
-	user.wantlist = function(){
-		return require('./wantlist.js')(client);
-	};
-	
+export * from './wantlist'
 	/**
 	 * Expose the list functions and pass the client instance
 	 * @returns {object}
 	 */
 	
-	user.list = function(){
-		return require('./list.js')(client);
-	};
+export * from './list'
 	
 	/**
 	 * Get the contributions for the given user
@@ -75,7 +64,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	user.getContributions = function(user, params, callback){
+export const getContributions = function(user, params, callback){
 		var path = '/users/'+util.escape(user)+'/contributions';
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -93,7 +82,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	user.getSubmissions = function(user, params, callback){
+export const getSubmissions = function(user, params, callback){
 		var path = '/users/'+util.escape(user)+'/submissions';
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -111,7 +100,7 @@ module.exports = function(client){
 	 * @return {DiscogsClient|Promise}
 	 */
 	
-	user.getLists = function(user, params, callback){
+export const getLists = function(user, params, callback){
 		var path = '/users/'+util.escape(user)+'/lists';
 		if((arguments.length === 2) && (typeof params === 'function')){
 			callback = params;
@@ -120,6 +109,3 @@ module.exports = function(client){
 		}
 		return client.get(path, callback);
 	};
-	
-	return user;
-};

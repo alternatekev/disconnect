@@ -1,23 +1,19 @@
-'use strict';
-
-var queryString = require('querystring'),
-	OAuth = require('oauth-1.0a'),
-	util = require('./util.js'),
-	Client = require('./client.js');
+import * as queryString from 'querystring'
+import * as OAuth from 'oauth-1.0a'
+import * as util from './util'
+import Client, {defaultConfig as defaultClientConfig} from './client'
 
 /**
  * Default configuration
  */
 
-var defaultConfig = {
-	requestTokenUrl: 'https://api.discogs.com/oauth/request_token',
-	accessTokenUrl: 'https://api.discogs.com/oauth/access_token',
-	authorizeUrl: 'https://www.discogs.com/oauth/authorize',
-	version: '1.0', 
-	signatureMethod: 'PLAINTEXT' // Or HMAC-SHA1
+ export enum defaultConfig {
+	requestTokenUrl = 'https://api.discogs.com/oauth/request_token',
+	accessTokenUrl = 'https://api.discogs.com/oauth/access_token',
+	authorizeUrl = 'https://www.discogs.com/oauth/authorize',
+	version = '1.0', 
+	signatureMethod = 'PLAINTEXT' // Or HMAC-SHA1
 };
-
-module.exports = DiscogsOAuth;
 
 /**
  * Object constructor
@@ -25,7 +21,7 @@ module.exports = DiscogsOAuth;
  * @returns {DiscogsOAuth}
  */
 
-function DiscogsOAuth(auth){
+export default function DiscogsOAuth(auth){
 	this.config = util.merge({}, defaultConfig);
 	this.auth = {method: 'oauth', level: 0};
 	if(auth && (typeof auth === 'object') && (auth.method === 'oauth')){
@@ -38,7 +34,7 @@ function DiscogsOAuth(auth){
  * @param {object} customConfig - Custom configuration object for Browserify/CORS/Proxy use cases
  * @returns {DiscogsOAuth}
  */
-DiscogsOAuth.prototype.setConfig = function(customConfig){
+export const setConfig = function(customConfig){
 	util.merge(this.config, customConfig);
 	return this;
 };
@@ -52,11 +48,11 @@ DiscogsOAuth.prototype.setConfig = function(customConfig){
  * @returns {DiscogsOAuth}
  */
  
-DiscogsOAuth.prototype.getRequestToken = function(consumerKey, consumerSecret, callbackUrl, callback){
+export const getRequestToken = function(consumerKey, consumerSecret, callbackUrl, callback){
 	var auth = this.auth, config = this.config;
 	auth.consumerKey = consumerKey;
 	auth.consumerSecret = consumerSecret;
-	new Client(auth).get({url: config.requestTokenUrl+'?oauth_callback='+OAuth.prototype.percentEncode(callbackUrl), queue: false, json: false}, function(err, data){
+	new Client(defaultClientConfig.userAgent, auth).get({url: config.requestTokenUrl+'?oauth_callback='+OAuth.prototype.percentEncode(callbackUrl), queue: false, json: false}, function(err, data){
 		if(!err && data){
 			data = queryString.parse(data);
 			auth.token = data.oauth_token;
@@ -75,9 +71,9 @@ DiscogsOAuth.prototype.getRequestToken = function(consumerKey, consumerSecret, c
  * @returns {DiscogsOAuth}
  */
  
-DiscogsOAuth.prototype.getAccessToken = function(verifier, callback){
+export const getAccessToken = function(verifier, callback){
 	var auth = this.auth;
-	new Client(auth).get({url: this.config.accessTokenUrl+'?oauth_verifier='+OAuth.prototype.percentEncode(verifier), queue: false, json: false}, function(err, data){
+	new Client(defaultClientConfig.userAgent, auth).get({url: this.config.accessTokenUrl+'?oauth_verifier='+OAuth.prototype.percentEncode(verifier), queue: false, json: false}, function(err, data){
 		if(!err && data){
 			data = queryString.parse(data);
 			auth.token = data.oauth_token;
@@ -94,7 +90,7 @@ DiscogsOAuth.prototype.getAccessToken = function(verifier, callback){
  * Generic function to return the auth object
  * @returns {object}
  */
-DiscogsOAuth.prototype.export = function(){
+export const exportAuth = function(){
 	return this.auth;
 };
 
@@ -104,7 +100,7 @@ DiscogsOAuth.prototype.export = function(){
  * @param {string} url - The url that is to be accessed
  * @returns {string}
  */
-DiscogsOAuth.prototype.toHeader = function(requestMethod, url){
+export const toHeader = function(requestMethod, url){
 	var oAuth = new OAuth({
 		consumer: {key: this.auth.consumerKey, secret: this.auth.consumerSecret},
 		signature_method: this.config.signatureMethod, version: this.config.version

@@ -1,0 +1,11 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES6",
+    "module": "commonjs",
+    "rootDir": "./",
+    "watch": true,
+    "resolveJsonModule": true
+  }
+}

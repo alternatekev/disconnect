@@ -1,27 +1,24 @@
-'use strict';
-
-var https = require('https'),
-    zlib = require('zlib'),
-    url = require('url'),
-    pkg = require('../package.json'),
-    error = require('./error.js'),
-    util = require('./util.js');
-
-module.exports = DiscogsClient;
+import * as https from 'https'
+import * as zlib from 'zlib'
+import * as url from 'url'
+import * as pkg from '../package.json'
+import * as error from './error'
+import * as util from './util'
 
 /**
  * Default configuration
  */
 
-var defaultConfig = {
-    host: 'api.discogs.com',
-    port: 443,
-    userAgent: 'DisConnectClient/' + pkg.version + ' +' + pkg.homepage,
-    apiVersion: 'v2',
-    outputFormat: 'discogs',    // Possible values: 'discogs' / 'plaintext' / 'html'
-    requestLimit: 25,           // Maximum number of requests to the Discogs API per interval
-    requestLimitAuth: 60,       // Maximum number of requests to the Discogs API per interval when authenticated
-    requestLimitInterval: 60000 // Request interval in milliseconds
+
+export enum defaultConfig {
+    host = 'api.discogs.com',
+    port = 443,
+    userAgent = `DisConnectTSClient/1.3/TypeScript`,
+    apiVersion = 'v2',
+    outputFormat = 'discogs',    // Possible values: 'discogs' / 'plaintext' / 'html'
+    requestLimit = 25,           // Maximum number of requests to the Discogs API per interval
+    requestLimitAuth = 60,       // Maximum number of requests to the Discogs API per interval when authenticated
+    requestLimitInterval = 60000 // Request interval in milliseconds
 };
 
 /**
@@ -38,10 +35,10 @@ var queue = require('./queue.js')({
  * Object constructor
  * @param {string} [userAgent] - The name of the user agent to use to make API calls
  * @param {object} [auth] - Optional authorization data object
- * @return {DiscogsClient}
+ * @return {DiscogsClient}s
  */
 
-function DiscogsClient(userAgent, auth) {
+export default function DiscogsClient(userAgent, auth): void {
     // Allow the class to be called as a function, returning an instance
     if (!(this instanceof DiscogsClient)) {
         return new DiscogsClient(userAgent, auth);
@@ -81,7 +78,7 @@ function DiscogsClient(userAgent, auth) {
  * @param {object} customConfig - Custom configuration object for Browserify/CORS/Proxy use cases
  * @return {DiscogsClient}
  */
-DiscogsClient.prototype.setConfig = function(customConfig) {
+export const setConfig = function(customConfig) {
     util.merge(this.config, customConfig);
     queue.setConfig({
         maxCalls: (this.authenticated() ? this.config.requestLimitAuth : this.config.requestLimit),
@@ -96,7 +93,7 @@ DiscogsClient.prototype.setConfig = function(customConfig) {
  * @return {boolean}
  */
 
-DiscogsClient.prototype.authenticated = function(level) {
+export const authenticated = function(level) {
     level = level || 0;
     return (!(typeof this.auth === 'undefined') && (this.auth.level > 0) && (this.auth.level >= level));
 };
@@ -107,7 +104,7 @@ DiscogsClient.prototype.authenticated = function(level) {
  * @return {DiscogsClient|Promise}
  */
 
-DiscogsClient.prototype.getIdentity = function(callback) {
+export const getIdentity = function(callback) {
     return this.get({url: '/oauth/identity', authLevel: 2}, callback);
 };
 
@@ -116,7 +113,7 @@ DiscogsClient.prototype.getIdentity = function(callback) {
  * @param {function} callback - Callback function receiving the data
  */
 
-DiscogsClient.prototype.about = function(callback) {
+export const about = function(callback) {
     var clientInfo = {
         version: pkg.version,
         userAgent: this.config.userAgent,
@@ -147,7 +144,7 @@ DiscogsClient.prototype.about = function(callback) {
  * @return {DiscogsClient}
  */
 
-DiscogsClient.prototype._rawRequest = function(options, callback) {
+export const _rawRequest = function(options, callback) {
     var data = options.data || null,
         method = options.method || 'GET',
         urlParts = url.parse(options.url),
@@ -206,7 +203,7 @@ DiscogsClient.prototype._rawRequest = function(options, callback) {
 
         // Pass the data to the callback and pass an error on unsuccessful HTTP status
         var passData = function() {
-            var err = null, status = parseInt(res.statusCode, 10);
+            var err = null, status = res.statusCode;
             if (status > 399) { // Unsuccessful HTTP status? Then pass an error to the callback
                 var match = data.match(/^\{"message": "(.+)"\}/i);
                 err = new error.DiscogsError(status, ((match && match[1]) ? match[1] : null));
@@ -217,9 +214,9 @@ DiscogsClient.prototype._rawRequest = function(options, callback) {
         // Find and add rate limiting when present
         if (res.headers['x-discogs-ratelimit']) {
             rateLimit = {
-                limit: parseInt(res.headers['x-discogs-ratelimit'], 10),
-                used: parseInt(res.headers['x-discogs-ratelimit-used'], 10),
-                remaining: parseInt(res.headers['x-discogs-ratelimit-remaining'], 10)
+                limit: res.headers['x-discogs-ratelimit'],
+                used: res.headers['x-discogs-ratelimit-used'],
+                remaining: res.headers['x-discogs-ratelimit-remaining']
             };
         }
 
@@ -263,9 +260,9 @@ DiscogsClient.prototype._rawRequest = function(options, callback) {
  * @return {DiscogsClient|Promise}
  */
 
-DiscogsClient.prototype._request = function(options, callback) {
+export const _request = function(options, callback) {
     var client = this,
-            doRequest = function() {
+            doRequest = function(callback) {
                 client._rawRequest(options, function(err, data, rateLimit) {
                     if (data && options.json && (data.indexOf('<!') !== 0)) {
                         data = JSON.parse(data);
@@ -308,7 +305,7 @@ DiscogsClient.prototype._request = function(options, callback) {
     // No callback provided? Return a Promise
     return new Promise(function(resolve, reject) {
         callback = function(err, data) {
-            (err && reject(err)) || resolve(data);
+            (err ? reject(err) : resolve(data));
         };
         prepareRequest();
     });
@@ -321,7 +318,7 @@ DiscogsClient.prototype._request = function(options, callback) {
  * @return {DiscogsClient|Promise}
  */
 
-DiscogsClient.prototype.get = function(options, callback) {
+export const get = function(options, callback) {
     if (typeof options === 'string') {
         options = {url: options};
     }
@@ -336,7 +333,7 @@ DiscogsClient.prototype.get = function(options, callback) {
  * @return {DiscogsClient|Promise}
  */
 
-DiscogsClient.prototype.post = function(options, data, callback) {
+export const post = function(options, data, callback) {
     if (typeof options === 'string') {
         options = {url: options};
     }
@@ -351,7 +348,7 @@ DiscogsClient.prototype.post = function(options, data, callback) {
  * @return {DiscogsClient|Promise}
  */
 
-DiscogsClient.prototype.put = function(options, data, callback) {
+export const put = function(options, data, callback) {
     if (typeof options === 'string') {
         options = {url: options};
     }
@@ -365,7 +362,7 @@ DiscogsClient.prototype.put = function(options, data, callback) {
  * @return {DiscogsClient|Promise}
  */
 
-DiscogsClient.prototype.delete = function(options, callback) {
+export const deleteItem = function(options, callback) {
     if (typeof options === 'string') {
         options = {url: options};
     }
@@ -377,7 +374,7 @@ DiscogsClient.prototype.delete = function(options, callback) {
  * @return {DiscogsOAuth}
  */
 
-DiscogsClient.prototype.oauth = function() {
+export const oauth = function() {
     var OAuth = require('./oauth.js');
     return new OAuth(this.auth);
 };
@@ -387,7 +384,7 @@ DiscogsClient.prototype.oauth = function() {
  * @return {object}
  */
 
-DiscogsClient.prototype.database = function() {
+export const database = function() {
     return require('./database.js')(this);
 };
 
@@ -396,7 +393,7 @@ DiscogsClient.prototype.database = function() {
  * @return {object}
  */
 
-DiscogsClient.prototype.marketplace = function() {
+export const marketplace = function() {
     return require('./marketplace.js')(this);
 };
 
@@ -405,6 +402,6 @@ DiscogsClient.prototype.marketplace = function() {
  * @return {object}
  */
 
-DiscogsClient.prototype.user = function() {
+export const user = function() {
     return require('./user.js')(this);
 };

@@ -1,15 +1,12 @@
-'use strict';
+import {addParams, escape} from './util'
+import * as client from './client'
 
-var util = require('./util.js');
-
-module.exports = function(client) {
-    var database = {};
-
-    /**
-     * Expose Discogs database status constants
-     */
-
-    database.status = {accepted: 'Accepted', draft: 'Draft', deleted: 'Deleted', rejected: 'Rejected'};
+export enum status {
+    accepted = 'Accepted',
+    draft = 'Draft',
+    deleted = 'Deleted',
+    rejected = 'Rejected'
+}
 
     /**
      * Get artist data
@@ -19,7 +16,7 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getArtist = function(artist, callback) {
+export const getArtist = function(artist, callback) {
         return client.get('/artists/' + artist, callback);
     };
 
@@ -31,12 +28,12 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getArtistReleases = function(artist, params, callback) {
+export const getArtistReleases = function(artist, params, callback) {
         var path = '/artists/' + artist + '/releases';
         if ((arguments.length === 2) && (typeof params === 'function')) {
             callback = params;
         } else {
-            path = util.addParams(path, params);
+            path = addParams(path, params);
         }
         return client.get(path, callback);
     };
@@ -48,7 +45,7 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getRelease = function(release, callback) {
+export const getRelease = function(release, callback) {
         return client.get('/releases/' + release, callback);
     };
 
@@ -60,8 +57,8 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getReleaseRating = function(release, user, callback) {
-        return client.get('/releases/' + release + '/rating/' + util.escape(user), callback);
+export const getReleaseRating = function(release, user, callback) {
+        return client.get('/releases/' + release + '/rating/' + escape(user), callback);
     };
 
     /**
@@ -73,8 +70,8 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.setReleaseRating = function(release, user, rating, callback) {
-        var url = '/releases/' + release + '/rating/' + util.escape(user);
+export const setReleaseRating = function(release, user, rating, callback) {
+        var url = '/releases/' + release + '/rating/' + escape(user);
         if (!rating) {
             return client.delete({url: url, authLevel: 2}, callback);
         } else {
@@ -89,7 +86,7 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getMaster = function(master, callback) {
+export const getMaster = function(master, callback) {
         return client.get('/masters/' + master, callback);
     };
 
@@ -101,12 +98,12 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getMasterVersions = function(master, params, callback) {
+export const getMasterVersions = function(master, params, callback) {
         var path = '/masters/' + master + '/versions';
         if ((arguments.length === 2) && (typeof params === 'function')) {
             callback = params;
         } else {
-            path = util.addParams(path, params);
+            path = addParams(path, params);
         }
         return client.get(path, callback);
     };
@@ -118,7 +115,7 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getLabel = function(label, callback) {
+export const getLabel = function(label, callback) {
         return client.get('/labels/' + label, callback);
     };
 
@@ -130,12 +127,12 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getLabelReleases = function(label, params, callback) {
+export const getLabelReleases = function(label, params, callback) {
         var path = '/labels/' + label + '/releases';
         if ((arguments.length === 2) && (typeof params === 'function')) {
             callback = params;
         } else {
-            path = util.addParams(path, params);
+            path = addParams(path, params);
         }
         return client.get(path, callback);
     };
@@ -147,7 +144,7 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.getImage = function(url, callback) {
+export const getImage = function(url, callback) {
         return client.get({url: url, encoding: 'binary', queue: false, json: false}, callback);
     };
 
@@ -159,7 +156,7 @@ module.exports = function(client) {
      * @return {DiscogsClient|Promise}
      */
 
-    database.search = function(query, params, callback) {
+export const search = function(query, params, callback) {
         var obj = {};
         if ((arguments.length === 2) && (typeof params === 'function')) {
             callback = params;
@@ -172,7 +169,7 @@ module.exports = function(client) {
         if (typeof query === 'string') {
             obj.q = query;
         }
-        return client.get({url: util.addParams('/database/search', obj), authLevel: 1}, callback);
+        return client.get({url: addParams('/database/search', obj), authLevel: 1}, callback);
     };
 
     return database;

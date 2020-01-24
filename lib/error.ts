@@ -1,7 +1,3 @@
-'use strict';
-
-var Errors = module.exports = {};
-
 /**
  * Discogs generic error
  * @param {number} [statusCode] - A HTTP status code
@@ -9,32 +5,33 @@ var Errors = module.exports = {};
  * @returns {DiscogsError}
  */
 
-function DiscogsError(statusCode, message){
+function DError(statusCode, message){
 	Error.captureStackTrace(this, this.constructor);
 	this.statusCode = statusCode||404;
 	this.message = message||'Unknown error.';
 }
-DiscogsError.prototype = Object.create(Error.prototype, {
-	constructor: {value: DiscogsError},
-	name: {value: 'DiscogsError'},
-	toString: {value: function(){
-		return this.name+': '+this.statusCode+' '+this.message;
-	}}
+
+export const DiscogsError = Object.create(Error.prototype, {
+	constructor: { value: DError },
+	name: { value: 'DiscogsError' },
+	toString: {
+		value: function () {
+			return this.name + ': ' + this.statusCode + ' ' + this.message;
+		}
+	}
 });
-Errors.DiscogsError = DiscogsError;
 
 /**
  * Discogs authorization error
  * @returns {AuthError}
  */
 
-function AuthError(){
+export function AError(){
 	Error.captureStackTrace(this, this.constructor);
 }
-AuthError.prototype = Object.create(DiscogsError.prototype, {
-	constructor: {value: AuthError},
+export const AuthError = Object.create(DiscogsError.prototype, {
+	constructor: {value: AError},
 	name: {value: 'AuthError'},
 	message: {value: 'You must authenticate to access this resource.'},
 	statusCode: {value: 401}
 });
-Errors.AuthError = AuthError;
